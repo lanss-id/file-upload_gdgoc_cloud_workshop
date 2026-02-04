@@ -17,8 +17,11 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Health check
-app.get('/', (req, res) => {
+// Serve static files (index.html)
+app.use(express.static('.'));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
     res.json({ status: 'OK', bucket: BUCKET_NAME });
 });
 

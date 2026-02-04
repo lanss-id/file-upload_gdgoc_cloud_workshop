@@ -372,6 +372,9 @@
 
         let selectedFile = null;
 
+        // Auto-fill backend URL with current origin
+        apiUrl.value = window.location.origin;
+
         // Click to browse
         uploadArea.onclick = () => fileInput.click();
 

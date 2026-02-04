@@ -1,5 +1,5 @@
 {
-  "name": "gogoc_cloud_workshop-file_upload",
+  "name": "gdgoc_cloud_workshop-file_upload",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {

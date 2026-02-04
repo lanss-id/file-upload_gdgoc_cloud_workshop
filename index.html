@@ -4,40 +4,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload - Google Cloud</title>
+    <title>Cloud Storage Upload</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #3000b4 0%, #68adfc 50%, #95e9e5 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 520px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .icon-cloud {
+            font-size: 56px;
+            margin-bottom: 12px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         h1 {
-            color: #333;
-            text-align: center;
+            color: hsl(240, 10%, 20%);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: hsl(240, 5%, 50%);
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .config {
+            background: linear-gradient(135deg, hsl(45, 100%, 96%), hsl(45, 100%, 92%));
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid hsl(45, 100%, 85%);
+        }
+
+        .config label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: hsl(240, 10%, 30%);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid hsl(240, 5%, 90%);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .config input:focus {
+            outline: none;
+            border-color: hsl(221, 70%, 65%);
+            box-shadow: 0 0 0 3px hsla(260, 70%, 65%, 0.1);
+        }
+
+        .config small {
+            display: block;
+            margin-top: 6px;
+            color: hsl(45, 60%, 40%);
+            font-size: 12px;
         }
 
         .upload-area {
-            border: 2px dashed #4285f4;
-            border-radius: 8px;
-            padding: 40px;
+            border: 2px dashed hsl(221, 70%, 70%);
+            border-radius: 16px;
+            padding: 48px 24px;
             text-align: center;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, hsl(260, 100%, 98%), hsl(260, 100%, 96%));
             cursor: pointer;
-            margin: 20px 0;
+            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, hsla(260, 70%, 65%, 0.05), hsla(280, 70%, 70%, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .upload-area:hover {
-            background: #e8f0fe;
+            background: linear-gradient(135deg, hsl(260, 100%, 96%), hsl(260, 100%, 94%));
+            border-color: hsl(199, 70%, 60%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px hsla(260, 70%, 65%, 0.2);
+        }
+
+        .upload-area:hover::before {
+            opacity: 1;
+        }
+
+        .upload-area.dragging {
+            background: linear-gradient(135deg, hsl(260, 100%, 94%), hsl(260, 100%, 92%));
+            border-color: hsl(209, 70%, 55%);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: scale(1.1);
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: hsl(240, 10%, 20%);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 14px;
+            color: hsl(240, 5%, 50%);
         }
 
         input[type="file"] {
@@ -46,86 +215,148 @@
 
         button {
             width: 100%;
-            padding: 12px;
-            background: #4285f4;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, hsl(229, 70%, 60%), hsl(280, 70%, 65%));
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px hsla(260, 70%, 60%, 0.3);
         }
 
-        button:hover {
-            background: #3367d6;
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px hsla(260, 70%, 60%, 0.4);
+            background: linear-gradient(135deg, hsl(226, 70%, 55%), hsl(280, 70%, 60%));
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px hsla(260, 70%, 60%, 0.3);
         }
 
         button:disabled {
-            background: #ccc;
+            background: linear-gradient(135deg, hsl(240, 5%, 80%), hsl(240, 5%, 75%));
             cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
 
         .result {
             margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 16px 18px;
+            border-radius: 12px;
             display: none;
+            font-size: 14px;
+            line-height: 1.6;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: linear-gradient(135deg, hsl(140, 70%, 95%), hsl(140, 70%, 92%));
+            color: hsl(140, 60%, 25%);
+            border: 1px solid hsl(140, 60%, 70%);
         }
 
         .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: linear-gradient(135deg, hsl(0, 70%, 95%), hsl(0, 70%, 92%));
+            color: hsl(0, 60%, 35%);
+            border: 1px solid hsl(0, 60%, 75%);
         }
 
         a {
-            color: #4285f4;
+            color: hsl(260, 70%, 55%);
+            font-weight: 500;
+            text-decoration: none;
             word-break: break-all;
+            transition: color 0.2s ease;
         }
 
-        .config {
-            background: #fff3cd;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        a:hover {
+            color: hsl(260, 70%, 45%);
+            text-decoration: underline;
         }
 
-        .config input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        .file-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: hsl(240, 10%, 20%);
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-size {
+            font-size: 13px;
+            color: hsl(240, 5%, 50%);
+            background: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 28px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .upload-area {
+                padding: 36px 20px;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>📤 File Upload</h1>
+        <div class="header">
+            <div class="icon-cloud">☁️</div>
+            <h1>Cloud Storage</h1>
+            <p class="subtitle">Upload file Anda dengan mudah dan aman</p>
+        </div>
 
         <!-- Backend URL Config -->
         <div class="config">
-            <strong>Backend URL:</strong>
+            <label>Backend URL</label>
             <input type="text" id="apiUrl" placeholder="https://your-service.run.app">
-            <small>Isi dengan URL Cloud Run service Anda</small>
+            <small>Masukkan URL Cloud Run service Anda</small>
         </div>
 
         <!-- Upload Area -->
         <div class="upload-area" id="uploadArea">
-            <div style="font-size: 48px;">☁️</div>
-            <p><strong>Klik atau Drag file ke sini</strong></p>
-            <p style="color: #666; font-size: 14px;">Max 10MB</p>
+            <div class="upload-icon">📁</div>
+            <p class="upload-text">Klik atau seret file ke sini</p>
+            <p class="upload-subtext">Maksimal ukuran file 10MB</p>
         </div>
         <input type="file" id="fileInput">
 
-        <!-- Buttons -->
+        <!-- Upload Button -->
         <button id="uploadBtn" disabled>Upload File</button>
 
         <!-- Result -->
@@ -149,36 +380,44 @@
             selectedFile = e.target.files[0];
             if (selectedFile) {
                 uploadBtn.disabled = false;
-                uploadArea.innerHTML = `
-                    <div style="font-size: 48px;">📄</div>
-                    <p><strong>${selectedFile.name}</strong></p>
-                    <p style="color: #666;">${(selectedFile.size / 1024).toFixed(2)} KB</p>
-                `;
+                updateUploadArea();
             }
         };
+
+        function updateUploadArea() {
+            uploadArea.innerHTML = `
+                <div class="upload-icon">📄</div>
+                <div class="file-info">
+                    <p class="file-name">${selectedFile.name}</p>
+                    <span class="file-size">${formatFileSize(selectedFile.size)}</span>
+                </div>
+            `;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
 
         // Drag & drop
         uploadArea.ondragover = (e) => {
             e.preventDefault();
-            uploadArea.style.background = '#e8f0fe';
+            uploadArea.classList.add('dragging');
         };
 
         uploadArea.ondragleave = () => {
-            uploadArea.style.background = '#f8f9fa';
+            uploadArea.classList.remove('dragging');
         };
 
         uploadArea.ondrop = (e) => {
             e.preventDefault();
-            uploadArea.style.background = '#f8f9fa';
+            uploadArea.classList.remove('dragging');
             selectedFile = e.dataTransfer.files[0];
             fileInput.files = e.dataTransfer.files;
             if (selectedFile) {
                 uploadBtn.disabled = false;
-                uploadArea.innerHTML = `
-                    <div style="font-size: 48px;">📄</div>
-                    <p><strong>${selectedFile.name}</strong></p>
-                    <p style="color: #666;">${(selectedFile.size / 1024).toFixed(2)} KB</p>
-                `;
+                updateUploadArea();
             }
         };
 
@@ -207,7 +446,7 @@
                 if (data.success) {
                     result.className = 'result success';
                     result.innerHTML = `
-                        ✅ Upload berhasil!<br>
+                        ✅ <strong>Upload berhasil!</strong><br>
                         <strong>File:</strong> ${data.filename}<br>
                         <strong>URL:</strong> <a href="${data.url}" target="_blank">${data.url}</a>
                     `;
@@ -216,7 +455,7 @@
                 }
             } catch (error) {
                 result.className = 'result error';
-                result.innerHTML = `❌ Upload gagal: ${error.message}`;
+                result.innerHTML = `❌ <strong>Upload gagal:</strong> ${error.message}`;
             } finally {
                 result.style.display = 'block';
                 uploadBtn.disabled = false;
